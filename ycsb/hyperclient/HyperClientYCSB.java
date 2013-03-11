@@ -172,6 +172,7 @@ public class HyperClientYCSB extends DB
         {
             values.put(entry.getKey(), entry.getValue().toArray());
         }
+        System.out.println("Key ="+key);        
 
         if (m_scannable)
         {
@@ -246,6 +247,24 @@ public class HyperClientYCSB extends DB
             {
                 result.put(key, new StringByteIterator(interres.get(key).toString()));
             }
+        }
+    }
+
+    private void writingLog(String line) {
+        try {
+            File file = new File("/home/morazow/LogFromYCSBHyperclient.txt");
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(line);
+            bw.newLine();
+            bw.close();
+        } catch (IOException e) {
+
+            e.printStackTrace();
         }
     }
 }
