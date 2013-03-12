@@ -27,7 +27,6 @@
 
 // C++
 #include <iostream>
-#include <fstream>
 
 // STL
 #include <algorithm>
@@ -110,12 +109,8 @@ hyperclient :: hyperclient(const char* coordinator, uint16_t port)
     , m_client_id(1)
     , m_have_seen_config(false)
 {
-    std::ofstream file;
-    file.open("configuration.txt");
-    show_config(file);
-    file.close();
-}
 
+}
 
 hyperclient :: ~hyperclient() throw ()
 {

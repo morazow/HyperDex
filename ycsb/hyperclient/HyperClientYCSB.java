@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.AbstractMap;
 import java.util.regex.*;
+import java.io.*;
 
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
@@ -53,6 +54,10 @@ public class HyperClientYCSB extends DB
     private boolean m_scannable;
     private int m_retries;
 
+    File file;
+    FileWriter fw;
+    BufferedWriter bw;
+
     /**
      * Initialize any state for this DB.
      * Called once per DB instance; there is one DB instance per client thread.
@@ -66,6 +71,19 @@ public class HyperClientYCSB extends DB
         m_mat = m_pat.matcher("user1");
         m_scannable = getProperties().getProperty("hyperclient.scannable", "false").equals("true");
         m_retries = 10;
+
+        // Write operations to a file
+        try {
+            file = new File("/home/morazow/LogFromYCSBHyperclient.txt");
+            //if (!file.exists()) {
+            //    file.createNewFile();
+            //}
+            fw = new FileWriter(file.getAbsoluteFile(), true);
+            bw = new BufferedWriter(fw);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -172,7 +190,6 @@ public class HyperClientYCSB extends DB
         {
             values.put(entry.getKey(), entry.getValue().toArray());
         }
-        System.out.println("Key ="+key);        
 
         if (m_scannable)
         {
@@ -252,18 +269,10 @@ public class HyperClientYCSB extends DB
 
     private void writingLog(String line) {
         try {
-            File file = new File("/home/morazow/LogFromYCSBHyperclient.txt");
-            // if file doesnt exists, then create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-            BufferedWriter bw = new BufferedWriter(fw);
             bw.write(line);
             bw.newLine();
-            bw.close();
-        } catch (IOException e) {
-
+            //bw.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
