@@ -836,6 +836,7 @@ class hyperclient
         // Introspect things
         hyperdatatype attribute_type(const char* space, const char* name,
                                      enum hyperclient_returncode* status);
+        hyperclient_returncode show_config(std::ostream& out);
 
     private:
         class complete;
@@ -855,7 +856,7 @@ class hyperclient
     // these are the only private things that tool_wrapper should touch
     private:
         hyperclient_returncode initialize_cluster(uint64_t cluster, const char* path);
-        hyperclient_returncode show_config(std::ostream& out);
+        //hyperclient_returncode show_config(std::ostream& out);
         hyperclient_returncode kill(uint64_t server_id);
         hyperclient_returncode initiate_transfer(uint64_t region_id, uint64_t server_id);
 

@@ -452,6 +452,7 @@ replication_manager :: chain_ack(const virtual_server_id& from,
                                  uint64_t version,
                                  const e::slice& key)
 {
+    static uint64_t cnt = 0;
     region_id ri(m_daemon->m_config.get_region_id(to));
 
     if (retransmission && m_daemon->m_data.check_acked(ri, reg_id, seq_id))
@@ -545,6 +546,8 @@ replication_manager :: chain_ack(const virtual_server_id& from,
             else
             {
                 rc = m_daemon->m_data.put(ri, reg_id, seq_id, key, op->value, version);
+                cnt++;
+                LOG(INFO) << "MORAZ: PUT operation" << cnt;
             }
         }
 

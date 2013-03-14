@@ -455,6 +455,7 @@ daemon :: process_req_get(server_id from,
                           std::auto_ptr<e::buffer> msg,
                           e::unpacker up)
 {
+    static uint64_t cnt = 0;
     uint64_t nonce;
     e::slice key;
 
@@ -487,6 +488,9 @@ daemon :: process_req_get(server_id from,
             result = NET_SERVERERROR;
             break;
     }
+
+    cnt++;
+    LOG(INFO) << "MORAZ: GET operations " << cnt;
 
     size_t sz = HYPERDEX_HEADER_SIZE_VC
               + sizeof(uint64_t)
