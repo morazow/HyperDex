@@ -35,6 +35,8 @@
 // po6
 #include <po6/net/location.h>
 
+#include <glog/logging.h>
+
 // e
 #include <e/endian.h>
 
@@ -116,6 +118,10 @@ hyperclient :: hyperclient(const char* coordinator, uint16_t port)
     file.open("configuration.txt");
     show_config(file);
     file.close();
+
+
+    google::InitGoogleLogging("HyperClientLog");
+    google::SetLogDestination(google::INFO, "hyperclient-");
 }
 
 
@@ -260,6 +266,9 @@ hyperclient :: get(const char* space, const char* key, size_t key_sz,
     size_t sz = HYPERCLIENT_HEADER_SIZE_REQ + sizeof(uint32_t) + key_sz;
     std::auto_ptr<e::buffer> msg(e::buffer::create(sz));
     msg->pack_at(HYPERCLIENT_HEADER_SIZE_REQ) << e::slice(key, key_sz);
+    //debug_op(std::cout, "get");
+    //LOG(INFO) << "get" << " ";
+    m_op_id = 1;
     return add_keyop(space, key, key_sz, msg, op);
 }
 
@@ -293,6 +302,7 @@ hyperclient :: del(const char* space, const char* key, size_t key_sz,
     { \
         const hyperclient_keyop_info* opinfo; \
         opinfo = hyperclient_keyop_info_lookup(XSTR(OPNAME), strlen(XSTR(OPNAME))); \
+        m_op_id = 0; \
         return perform_funcall1(opinfo, space, key, key_sz, NULL, 0, attrs, attrs_sz, status); \
     } \
     extern "C" \
@@ -1464,6 +1474,15 @@ hyperclient :: add_keyop(const char* space, const char* key, size_t key_sz,
         return -1;
     }
 
+//    debug_op(std::cout, " ");
+//    debug_op(std::cout, key);
+//    debug_op(std::cout, " ");
+//    debug_op(std::cout, vsi.get());
+//    debug_op(std::cout, "\n");
+
+    //LOG(INFO) << key << " " << vsi.get() << "\n";
+    LOG(INFO) << (m_op_id ? "GET" : "PUT")  << " " << m_config->get_server_id(vsi) <<" "<< m_config->get_address(m_config->get_server_id(vsi)) << "\n";
+
     op->set_server_visible_nonce(m_server_nonce);
     ++m_server_nonce;
     op->set_sent_to(vsi);
@@ -1584,4 +1603,8 @@ operator << (std::ostream& lhs, hyperclient_returncode rhs)
     }
 
     return lhs;
+}
+
+void debug_op(std::ostream& out, const char *str) {
+    out << str;
 }

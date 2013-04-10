@@ -923,10 +923,12 @@ class hyperclient
         int64_t m_server_nonce;
         int64_t m_client_id;
         bool m_have_seen_config;
+        uint8_t m_op_id;
 };
 
 std::ostream&
 operator << (std::ostream& lhs, hyperclient_returncode rhs);
 
+void debug_op(std::ostream& out, const char *str);
 #endif /* __cplusplus */
 #endif /* hyperclient_h_ */
