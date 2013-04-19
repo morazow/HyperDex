@@ -358,6 +358,32 @@ HYPERCLIENT_CPPDEF(set_union)
     } \
     }
 
+int64_t
+hyperclient :: cond_map_add(const char* space, const char* key, size_t key_sz,
+                            const struct hyperclient_attribute_check* checks, size_t checks_sz,
+                            const struct hyperclient_map_attribute* attrs, size_t attrs_sz,
+                            enum hyperclient_returncode* status)
+{
+    const hyperclient_keyop_info* opinfo;
+    opinfo = hyperclient_keyop_info_lookup(XSTR(cond_map_add), strlen(XSTR(cond_map_add)));
+    return perform_funcall2(opinfo, space, key, key_sz, checks, checks_sz, attrs, attrs_sz, status);
+}
+
+extern "C"
+{
+
+int64_t
+hyperclient_cond_map_add(struct hyperclient* client,
+                         const char* space, const char* key, size_t key_sz,
+                         const struct hyperclient_attribute_check* checks, size_t checks_sz,
+                         const struct hyperclient_map_attribute* attrs, size_t attrs_sz,
+                         hyperclient_returncode* status)
+{
+    C_WRAP_EXCEPT(client->cond_map_add(space, key, key_sz, checks, checks_sz, attrs, attrs_sz, status));
+}
+
+}
+
 HYPERCLIENT_MAP_CPPDEF(map_add)
 HYPERCLIENT_MAP_CPPDEF(map_remove)
 HYPERCLIENT_MAP_CPPDEF(map_atomic_add)
@@ -1329,6 +1355,29 @@ hyperclient :: prepare_searchop(const char* space,
     return 0;
 }
 
+static bool
+validate_check(const hyperdex::schema* sc,
+               const hyperclient_attribute_check* chk,
+               uint16_t attrnum)
+{
+    switch (chk->predicate)
+    {
+        case HYPERPREDICATE_FAIL:
+            return true;
+        case HYPERPREDICATE_EQUALS:
+        case HYPERPREDICATE_LESS_EQUAL:
+        case HYPERPREDICATE_GREATER_EQUAL:
+            return container_implicit_coercion(sc->attrs[attrnum].type,
+                                               e::slice(chk->value, chk->value_sz),
+                                               chk->datatype);
+        case HYPERPREDICATE_CONTAINS_LESS_THAN:
+            return validate_as_type(e::slice(chk->value, chk->value_sz), chk->datatype) &&
+                   chk->datatype == HYPERDATATYPE_INT64;
+        default:
+            return false;
+    }
+}
+
 size_t
 hyperclient :: prepare_checks(const hyperdex::schema* sc,
                               const hyperclient_attribute_check* checks, size_t checks_sz,
@@ -1347,9 +1396,7 @@ hyperclient :: prepare_checks(const hyperdex::schema* sc,
             return i;
         }
 
-        if (!container_implicit_coercion(sc->attrs[attrnum].type,
-                                         e::slice(checks[i].value, checks[i].value_sz),
-                                         checks[i].datatype))
+        if (!validate_check(sc, &checks[i], attrnum))
         {
             *status = HYPERCLIENT_WRONGTYPE;
             return i;
