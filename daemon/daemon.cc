@@ -183,7 +183,6 @@ daemon :: run(bool daemonize,
         google::SetLogSymlink(google::WARNING, "");
         google::SetLogSymlink(google::ERROR, "");
         google::SetLogSymlink(google::FATAL, "");
-        google::InitGoogleLogging("DaemonLog");
         google::SetLogDestination(google::INFO, "hyperdex-daemon-");
 
         if (::daemon(1, 0) < 0)
