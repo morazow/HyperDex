@@ -427,7 +427,8 @@ coordinator :: initialize(replicant_state_machine_context* ctx, uint64_t token)
 #ifdef __APPLE__
         srand(m_seed);
 #else
-        srand48_r(m_cluster, &m_seed);
+        srand48_r(0, &m_seed);
+        //srand48_r(m_cluster, &m_seed);
 #endif
         issue_new_config(ctx);
         return generate_response(ctx, COORD_SUCCESS);
@@ -1379,6 +1380,7 @@ void
 coordinator :: initial_layout(struct replicant_state_machine_context* ctx,
                               space* s)
 {
+    srand48_r(0, &m_seed);
     for (size_t i = 0; i < s->subspaces.size(); ++i)
     {
         subspace& ss(s->subspaces[i]);
