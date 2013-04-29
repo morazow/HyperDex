@@ -547,7 +547,7 @@ replication_manager :: chain_ack(const virtual_server_id& from,
             {
                 rc = m_daemon->m_data.put(ri, reg_id, seq_id, key, op->value, version);
                 cnt++;
-                LOG(INFO) << "MORAZ: PUT operation" << cnt;
+                LOG(INFO) << "MORAZ: PUT operation" << cnt << "-"<<key.data();
             }
         }
 
