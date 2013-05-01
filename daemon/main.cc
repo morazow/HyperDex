@@ -176,8 +176,7 @@ main(int argc, const char* argv[])
         }
     }
 
-    google::InitGoogleLogging("daemon");
-    //google::InitGoogleLogging(argv[0]);
+    google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
     try

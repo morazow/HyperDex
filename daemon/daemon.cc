@@ -172,7 +172,7 @@ daemon :: run(bool daemonize,
         return EXIT_FAILURE;
     }
 
-    google::LogToStderr();
+    //google::LogToStderr();
 
     if (daemonize)
     {
