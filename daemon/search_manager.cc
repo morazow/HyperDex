@@ -195,12 +195,18 @@ search_manager :: start(const server_id& from,
         return;
     }
 
+    LOG(INFO) << "SEARCH STARTS";
+
     const schema* sc = m_daemon->m_config.get_schema(ri);
     assert(sc);
     e::intrusive_ptr<state> st = new state(ri, msg, checks);
     datalayer::returncode rc;
     std::stable_sort(st->checks.begin(), st->checks.end());
+    uint64_t t_start = e::time();
     rc = m_daemon->m_data.make_snapshot(st->region, *sc, &st->checks, &st->snap, NULL);
+    uint64_t t_end = e::time();
+
+    LOG(INFO)<< "\t m_data.make_snapshot takes = "<<(t_end - t_start)<<" ns";
 
     switch (rc)
     {
@@ -232,6 +238,10 @@ search_manager :: next(const server_id& from,
     id sid(ri, from, search_id);
     e::intrusive_ptr<state> st;
 
+    LOG(INFO) <<"SEARCH NEXT";
+
+
+    uint64_t t_start = e::time();
     if (!m_searches.lookup(sid, &st))
     {
         std::auto_ptr<e::buffer> msg(e::buffer::create(HYPERDEX_HEADER_SIZE_VC + sizeof(uint64_t)));
@@ -239,9 +249,15 @@ search_manager :: next(const server_id& from,
         m_daemon->m_comm.send_client(to, from, RESP_SEARCH_DONE, msg);
         return;
     }
+    uint64_t t_end = e::time();
+    LOG(INFO) <<"\t m_searches.lookup(sid, &st) takes = "<<(t_end - t_start)<<" ns";
 
+    t_start = e::time();
     po6::threads::mutex::hold hold(&st->lock);
+    t_end = e::time();
+    LOG(INFO) <<"\t threads::mutex hold takes = "<<(t_end - t_start)<<" ns";
 
+    t_start = e::time();
     if (st->snap.valid())
     {
         e::slice key;
@@ -264,6 +280,8 @@ search_manager :: next(const server_id& from,
         m_daemon->m_comm.send_client(to, from, RESP_SEARCH_DONE, msg);
         stop(from, to, search_id);
     }
+    t_end = e::time();
+    LOG(INFO) <<"\t st->snap.valid() takes = "<<(t_end - t_start)<<" ns";
 }
 
 void
