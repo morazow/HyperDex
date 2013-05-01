@@ -177,6 +177,7 @@ main(int argc, const char* argv[])
     }
 
     google::InitGoogleLogging(argv[0]);
+    google::SetLogDestination(google::INFO, "hyperdaemon-");
     google::InstallFailureSignalHandler();
 
     try
