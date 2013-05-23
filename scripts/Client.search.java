@@ -72,6 +72,7 @@ public class Search {
                     while (true) {
                         try {
                             lb = System.nanoTime();
+                            values.put("region", region);
                             s = m_client.search("hotels", values);
                             le = System.nanoTime();
                             long ls = le - lb;
