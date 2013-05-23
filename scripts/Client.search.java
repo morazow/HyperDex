@@ -62,6 +62,7 @@ public class Search {
             
             HashMap<String, Object> values = new HashMap<String, Object>();
             HyperClient m_client = new HyperClient(COORD_IP, 1982);
+            SearchBase s;
 
             try {
                 long end, begin = System.nanoTime(), lb, le;
