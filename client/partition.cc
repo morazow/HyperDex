@@ -106,7 +106,8 @@ hyperdex :: partition(uint16_t num_attrs, uint32_t num_servers, std::vector<regi
     double attrs_per_dimension(num_servers);
     attrs_per_dimension = pow(attrs_per_dimension, 1/double(num_attrs));
     std::vector<uint64_t> dimensions(num_attrs, uint64_t(attrs_per_dimension));
-    uint64_t partitions = dimensions.size() * dimensions[0];
+    //uint64_t partitions = dimensions.size() * dimensions[0];
+    uint64_t partitions = pow(dimensions[0], dimensions.size());
 
     for (size_t i = 0; partitions < num_servers && i < num_attrs; ++i)
     {
